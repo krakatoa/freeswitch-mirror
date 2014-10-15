@@ -1,0 +1,9 @@
+Origin: PCPool
+Label: PCPool
+Suite: stable
+Codename: pcpool
+Version: 3.0
+Architectures: i386 amd64
+Components: contrib
+Description: Freeswitch package repository
+#SignWith: D3CF695E
