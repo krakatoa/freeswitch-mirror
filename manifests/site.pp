@@ -14,26 +14,25 @@ node /apt/ {
     group => "www-data"
   }
 
-  file { "/var/spool/apt-mirror/mirror/files.freeswitch.org":
-    ensure => "directory",
-    recurse => true,
-    owner => "www-data",
-    group => "www-data"
-  }
+  $mirror_dirs = [  "/var/spool/apt-mirror", "/var/spool/apt-mirror/mirror", "/var/spool/apt-mirror/mirror/files.freeswitch.org",
+                    "/var/spool/apt-mirror/mirror/files.freeswitch.org/repo", "/var/spool/apt-mirror/mirror/files.freeswitch.org/repo/deb",
+                    "/var/spool/apt-mirror/mirror/files.freeswitch.org/repo/deb/debian", "/var/spool/apt-mirror/mirror/files.freeswitch.org/repo//deb/debian/conf" ]
 
-  file { "/var/spool/apt-mirror/mirror/files.freeswitch.org/repo/deb/debian/conf":
-    ensure => "directory",
-    recurse => true,
-    owner => "www-data",
-    group => "www-data"
-  } -> class { 'nginx': }
+  $mirror_dirs.each |$dir| {
+    file { $dir:
+      ensure => "directory",
+      owner => "apt-mirror",
+      group => "www-data",
+      mode => "0775"
+    }
+  }
 
   file { "/var/spool/apt-mirror/mirror/files.freeswitch.org/repo/deb/debian/conf/distributions":
     content => template("reprepro/conf/distributions"),
     require => File["/var/spool/apt-mirror/mirror/files.freeswitch.org/repo/deb/debian/conf"],
-    owner => "www-data",
+    owner => "apt-mirror",
     group => "www-data"
-  }
+  } -> class { 'nginx': }
 
   file { 'nginx site conf':
     path => "/etc/nginx/sites-available/packages",
